@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="egf-ND-X22">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Scan View Controller-->
+        <scene sceneID="ESp-v2-gsP">
+            <objects>
+                <viewController id="egf-ND-X22" customClass="ScanViewController" customModule="RouterFactoryDemo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4NF-XY-2Bi">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JL3-Vq-XQT">
+                                <rect key="frame" x="16" y="521" width="343" height="30"/>
+                                <color key="backgroundColor" red="0.0" green="0.58980089430000004" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Start Scan">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="startScan:" destination="egf-ND-X22" eventType="touchUpInside" id="rdU-ZP-8wN"/>
+                                </connections>
+                            </button>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AkC-uN-OaU">
+                                <rect key="frame" x="16" y="162" width="343" height="343"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="AkC-uN-OaU" secondAttribute="height" multiplier="1:1" id="zYR-Me-PTB"/>
+                                </constraints>
+                            </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xNe-of-myS">
+                                <rect key="frame" x="16" y="567" width="343" height="30"/>
+                                <color key="backgroundColor" red="0.88235294119999996" green="0.34509803919999998" blue="0.16078431369999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Done">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="done:" destination="egf-ND-X22" eventType="touchUpInside" id="LDq-MX-dFp"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="JL3-Vq-XQT" firstAttribute="leading" secondItem="0za-RM-N1D" secondAttribute="leading" constant="16" id="397-a4-aTw"/>
+                            <constraint firstItem="AkC-uN-OaU" firstAttribute="leading" secondItem="0za-RM-N1D" secondAttribute="leading" constant="16" id="GZP-1I-Qlk"/>
+                            <constraint firstItem="xNe-of-myS" firstAttribute="leading" secondItem="0za-RM-N1D" secondAttribute="leading" constant="16" id="HYx-5S-QVB"/>
+                            <constraint firstItem="xNe-of-myS" firstAttribute="top" secondItem="JL3-Vq-XQT" secondAttribute="bottom" constant="16" id="JEe-RW-KIC"/>
+                            <constraint firstItem="AkC-uN-OaU" firstAttribute="centerY" secondItem="4NF-XY-2Bi" secondAttribute="centerY" id="QS4-3B-0ng"/>
+                            <constraint firstItem="0za-RM-N1D" firstAttribute="trailing" secondItem="AkC-uN-OaU" secondAttribute="trailing" constant="16" id="b9y-rj-4uf"/>
+                            <constraint firstItem="JL3-Vq-XQT" firstAttribute="top" secondItem="AkC-uN-OaU" secondAttribute="bottom" constant="16" id="iYZ-Dm-ZhR"/>
+                            <constraint firstItem="0za-RM-N1D" firstAttribute="trailing" secondItem="xNe-of-myS" secondAttribute="trailing" constant="16" id="sMR-df-Mk4"/>
+                            <constraint firstItem="0za-RM-N1D" firstAttribute="trailing" secondItem="JL3-Vq-XQT" secondAttribute="trailing" constant="16" id="udc-rd-RWO"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="0za-RM-N1D"/>
+                    </view>
+                    <connections>
+                        <outlet property="scanScorePickerView" destination="AkC-uN-OaU" id="JJM-Nb-hUS"/>
+                        <segue destination="bSd-3d-rLq" kind="show" identifier="demographicSegue" id="uGd-rp-XfZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cfN-a0-PKf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-350" y="73"/>
+        </scene>
+        <!--Demographics-->
+        <scene sceneID="hM9-SJ-DaO">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Demographics" id="bSd-3d-rLq" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0RK-Op-Dy7" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="261" y="72"/>
+        </scene>
+    </scenes>
+</document>
