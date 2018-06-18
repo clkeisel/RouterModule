@@ -1,0 +1,1 @@
+This software is intended to demonstrate how dynamic navigating could be done in an iOS app. This is accomplished by using the iterator pattern in a router and building the router in a factory based on the user's input. If you happened to stumble upon this project while browsing github feel free to take a look and provide feedback if you would like. 
