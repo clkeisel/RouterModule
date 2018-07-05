@@ -17,17 +17,27 @@ class DemographicViewController: UIViewController, UIPickerViewDelegate, UIPicke
     var demographicModule = AppData.getSharedAppData().demoModule
     var scanModule = AppData.getSharedAppData().scanModules[0]
     var demoContainerVC: DemographicContainerViewController!
+    var routerNav: RouterNavigationController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         demoContainerVC = self.childViewControllers[0] as! DemographicContainerViewController
-        demoContainerVC.currentDemographic = demographicModule?.next() as? Demographic
+        demoContainerVC.currentDemographic = demographicModule?.next()
+        
+        routerNav = self.navigationController as? RouterNavigationController
+        
         if let pages = demographicModule?.navQueue.count {
             pageControl.numberOfPages = pages
         }
         skipButton.isHidden = demographicModule!.isRequired
+        
+        guard let routerNav = self.navigationController as? RouterNavigationController else {
+            print("Demographics expected RouterNavigationController but didn't find one.")
+            return
+        }
+        self.routerNav = routerNav
     }
 
     override func didReceiveMemoryWarning() {
@@ -38,22 +48,18 @@ class DemographicViewController: UIViewController, UIPickerViewDelegate, UIPicke
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         guard let demographics = demographicModule else { return 0 }
-        let demographic = demographics.navQueue[demographics.current] as? Demographic
-        return demographic?.rowTitles.count ?? 0
+        let demographic = demographics.navQueue[demographics.current]
+        return demographic.rowTitles.count
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         guard let demographics = demographicModule else { return 0 }
-        let demographic = demographics.navQueue[demographics.current] as? Demographic
-        return demographic?.rowData.count ?? 0
+        let demographic = demographics.navQueue[demographics.current]
+        return demographic.rowData.count
     }
     
     @IBAction func skip(_ sender: Any) {
-        guard let nextSegueIdentifer = scanModule.router.next() as? String else {
-            navigationController?.popToRootViewController(animated: true)
-            return
-        }
-        self.performSegue(withIdentifier: nextSegueIdentifer, sender: self)
+        routerNav!.next()
     }
     
     @IBAction func next(_ sender: Any) {
@@ -62,14 +68,10 @@ class DemographicViewController: UIViewController, UIPickerViewDelegate, UIPicke
             backButton.isEnabled = true
             
             // Set the demographic to the next one in the module
-            demoContainerVC.currentDemographic = demographicModule?.next() as? Demographic
+            demoContainerVC.currentDemographic = demographicModule?.next()
             demoContainerVC.nextDeomgraphic()
         } else {
-            guard let nextSegueIdentifier = scanModule.router.next() as? String else {
-                navigationController?.popToRootViewController(animated: true)
-                return
-            }
-            self.performSegue(withIdentifier: nextSegueIdentifier, sender: self)
+            routerNav!.next()
         }
     }
     

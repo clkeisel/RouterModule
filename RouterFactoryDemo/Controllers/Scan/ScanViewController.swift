@@ -50,11 +50,11 @@ class ScanViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     }
     
     @IBAction func done(_ sender: Any) {
-        guard let segueIdentifier = scanModule.router.next() as? String else {
-            navigationController?.popToRootViewController(animated: true)
+        guard let router = self.navigationController as? RouterNavigationController else {
+            print("Scan View Controller expected a RouterNavigationController, but wasn't found.")
             return
         }
-        self.performSegue(withIdentifier: segueIdentifier, sender: sender)
+        router.next()
     }
     
     /*

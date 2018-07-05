@@ -23,13 +23,20 @@ class ModuleFactory: NSObject {
     let demographicName = "DEMOGRAPHICS"
     let demographicDesc = "TELL US ABOUT YOURSELF FOR SPECIAL FEATURES AND TO EARN DISCOUNTS."
     
-    // MARK: Routers
-    var scanRouter: RouterModule?
+    //MARK: Routers
+    var scanRouter: RouterNavigationController?
+    var demoScanRouter: RouterNavigationController?
+    var thvScanRouter: RouterNavigationController?
 
     var scanOperator: ScanOperator? {
         didSet {
             // Router modules must be built first as other modules are dependent on them
-            buildRouterModules()
+            do {
+                try buildRouterModules()
+            } catch let error as NSError {
+                print(error)
+            }
+            
             buildScanModules()
             buildDemographicsModule()
         }
@@ -38,7 +45,6 @@ class ModuleFactory: NSObject {
     static var sharedFactory = ModuleFactory()
     
     private override init() {
-        scanRouter = nil
         super.init()
     }
     
@@ -131,16 +137,22 @@ extension ModuleFactory {
 
 // MARK: router module factory method
 extension ModuleFactory {
-    private func buildRouterModules() {
+    private func buildRouterModules() throws {
+        let storyboard = UIStoryboard(name: "Scan", bundle: nil)
+        guard let navRouter = storyboard.instantiateViewController(withIdentifier: "ScanNav") as? RouterNavigationController else {
+            let error = NSError(domain: "ModuleFactory", code: 1, userInfo: ["Message": "Could not instantiate Router from storyboard \(storyboard)"])
+            throw error
+        }
         switch scanOperator?.market {
         case "North America":
-            scanRouter = RouterModule(withNavQueue: ["scanSegue"])
+            navRouter.navQueue = ["ScanProcess"]
         case "Germany":
-            scanRouter = RouterModule(withNavQueue: ["scanSegue", "demographicSegue"])
+            navRouter.navQueue = ["ScanProcess", "Demographics"]
         case "China":
-            scanRouter = RouterModule(withNavQueue: ["demographicSegue", "scanSegue"])
+            navRouter.navQueue = ["Demographics", "ScanProcess"]
         default:
-            scanRouter = RouterModule(withNavQueue: ["scanSegue"])
+            navRouter.navQueue = ["ScanProcess"]
         }
+        scanRouter = navRouter
     }
 }

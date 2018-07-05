@@ -11,7 +11,7 @@ import UIKit
 class AppData {
     
     var scanModules = [ScanModule]()
-    var demoModule: DemographicModule?
+    var demoModule: DemographicModule<Demographic>?
     private static var sharedAppData = AppData()
     
     private init() {}

@@ -9,9 +9,8 @@
 import UIKit
 
 // Module protocol factory fields
-@objc protocol ModuleProtocol {
-    var name: String { get set }
-    var details: String { get set }
-    var icon: UIImage { get set }
-    @objc optional var getEntryPoint: String? { get set }
+protocol ModuleProtocol {
+    var name: String { get }
+    var details: String { get }
+    var icon: UIImage { get }
 }

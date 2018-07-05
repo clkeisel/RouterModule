@@ -13,9 +13,9 @@ class ScanModule: ModuleProtocol{
     var name: String
     var details: String
     var icon: UIImage
-    var router: RouterModule
+    var router: RouterNavigationController?
     
-    init(withName name:String, description:String, icon:UIImage, router:RouterModule ) {
+    init(withName name:String, description:String, icon:UIImage, router:RouterNavigationController ) {
         self.name = name
         self.details = name
         self.icon = icon
