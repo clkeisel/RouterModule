@@ -56,8 +56,9 @@ class MarketSelectTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let scanOperator = ScanOperator(withMarket: markets[indexPath.row])
-        ModuleFactory.sharedFactory.scanOperator = scanOperator
+        let market = markets[indexPath.row]
+        ModuleFactory.sharedFactory.market = market
+        ModuleFactory.sharedFactory.buildModulesForMarket(market: market)
         performSegue(withIdentifier: "scanMenuSegue", sender: self)
     }
 

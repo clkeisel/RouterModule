@@ -12,16 +12,26 @@ class RouterModule: RouterProtocol {
     
     var navQueue = [String]()
     var current: Int = 0
-    private let navController: UINavigationController
+    let navController: UINavigationController
     private let storyboard: UIStoryboard
+    private var rootIdentifier: String!
     
     init(navController: UINavigationController) {
         self.navController = navController
         self.storyboard = navController.storyboard!
     }
     
+    func setRootViewController(rootViewControllerIdentity: String) {
+        guard let root = self.navController.storyboard?.instantiateViewController(withIdentifier: rootViewControllerIdentity) else {
+            print("Unable to instantiate view controller with storyboard ID \(rootViewControllerIdentity)")
+            return
+        }
+        self.rootIdentifier = rootViewControllerIdentity
+        self.navController.viewControllers = [root]
+    }
+    
     func hasNext() -> Bool {
-        return current < navQueue.count
+        return current + 1 < navQueue.count
     }
     
     func hasPrevious() -> Bool {
@@ -31,8 +41,13 @@ class RouterModule: RouterProtocol {
     func next() {
         if hasNext() {
             current += 1
-            storyboard.instantiateViewController(withIdentifier: navQueue[current - 1])
+            let vc = storyboard.instantiateViewController(withIdentifier: navQueue[current])
+            navController.pushViewController(vc, animated: true)
         } else {
+            // Reset the navController to root
+            self.navController.viewControllers = []
+            self.setRootViewController(rootViewControllerIdentity: rootIdentifier)
+            current = 0
             navController.dismiss(animated: true, completion: nil)
         }
     }

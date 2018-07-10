@@ -6,17 +6,27 @@
 //  Copyright © 2018 Patomalo Development. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class AppData {
     
     var scanModules = [ScanModule]()
-    var demoModule: DemographicModule<Demographic>?
-    private static var sharedAppData = AppData()
+    var demoModule: DemographicModule!
+    var currentScanRouter: RouterModule!
+    static let sharedAppData = AppData()
     
     private init() {}
     
-    class func getSharedAppData() -> AppData {
-        return sharedAppData
+    func setScanRouter(moduleName: String) {
+        switch moduleName {
+        case "HAND SCAN":
+            currentScanRouter = ModuleFactory.sharedFactory.handScanRouter
+        case "DEMO SCAN":
+            currentScanRouter = ModuleFactory.sharedFactory.demoScanRouter
+        case "THV SCAN":
+            currentScanRouter = ModuleFactory.sharedFactory.thvScanRouter
+        default:
+            currentScanRouter = ModuleFactory.sharedFactory.handScanRouter
+        }
     }
 }

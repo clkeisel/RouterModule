@@ -10,8 +10,7 @@ import UIKit
 
 class ScanModulesTableViewController: UITableViewController {
     
-    let appData = AppData.getSharedAppData()
-    var selectedRow = 0
+    let appData = AppData.sharedAppData
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,9 +51,12 @@ class ScanModulesTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedRow = indexPath.row
-        let vc = appData.scanModules[selectedRow].router
-        present(vc!, animated: true, completion: nil)
+        appData.setScanRouter(moduleName: appData.scanModules[indexPath.row].name)
+        guard let routerModule = appData.currentScanRouter else {
+            print("Failed to get Router from AppData")
+            return
+        }
+        present(routerModule.navController, animated: true, completion: nil)
     }
     
     /*

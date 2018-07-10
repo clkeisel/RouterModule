@@ -10,6 +10,14 @@ import UIKit
 
 class ModuleFactory: NSObject {
     
+    //MARK: - Fields
+    
+    static let sharedFactory = ModuleFactory()
+    
+    var market: String
+    
+    var demoModule: DemographicModule!
+
     let handScanIcon = UIImage(named: "ConvertIcon")!
     let handScan = "HAND SCAN"
     let handScanDesc = "FIND OUT YOUR SKIN CAROTENOID SCORE"
@@ -23,29 +31,33 @@ class ModuleFactory: NSObject {
     let demographicName = "DEMOGRAPHICS"
     let demographicDesc = "TELL US ABOUT YOURSELF FOR SPECIAL FEATURES AND TO EARN DISCOUNTS."
     
-    //MARK: Routers
-    var scanRouter: RouterNavigationController?
-    var demoScanRouter: RouterNavigationController?
-    var thvScanRouter: RouterNavigationController?
-
-    var scanOperator: ScanOperator? {
-        didSet {
-            // Router modules must be built first as other modules are dependent on them
-            do {
-                try buildRouterModules()
-            } catch let error as NSError {
-                print(error)
-            }
-            
-            buildScanModules()
-            buildDemographicsModule()
-        }
+    enum ModuleFactoryError: Error {
+        case invalidInitialControllerForRouter
     }
     
-    static var sharedFactory = ModuleFactory()
+    //MARK: - Routers
+    var handScanRouter: RouterModule!
+    var demoScanRouter: RouterModule!
+    var thvScanRouter: RouterModule!
     
+    //MARK: - Factory Functions
     private override init() {
+        self.demoModule = DemographicModule()
+        self.market = ""
         super.init()
+    }
+    
+    func buildModulesForMarket(market: String) {
+        self.market = market
+        do {
+            buildDemographicsModule()
+            try buildRouterModules()
+            buildScanModules()
+        } catch ModuleFactoryError.invalidInitialControllerForRouter {
+            print("Unable to build Scan Modules because the initial view controller of a module must be a UINavigationController")
+        } catch {
+            print("Unexpected error: \(error).")
+        }
     }
     
 }
@@ -54,23 +66,23 @@ class ModuleFactory: NSObject {
 extension ModuleFactory {
     private func buildScanModules() {
         var scanModules = [ScanModule]()
-        switch scanOperator?.market {
+        
+        switch market {
         case "North America":
-            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: scanRouter!))
+            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: handScanRouter))
+            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: demoScanRouter))
         case "Germany":
-            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: thvScanName, description: thvScanDesc, icon: thvScanIcon, router: scanRouter!))
+            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: handScanRouter))
+            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: demoScanRouter))
+            scanModules.append(ScanModule(withName: thvScanName, description: thvScanDesc, icon: thvScanIcon, router: thvScanRouter))
         case "China":
-            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: thvScanName, description: thvScanDesc, icon: thvScanIcon, router: scanRouter!))
+            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: handScanRouter))
+            scanModules.append(ScanModule(withName: thvScanName, description: thvScanDesc, icon: thvScanIcon, router: thvScanRouter))
         default:
-            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: scanRouter!))
-            scanModules.append(ScanModule(withName: thvScanName, description: thvScanDesc, icon: thvScanIcon, router: scanRouter!))
+            scanModules.append(ScanModule(withName: handScan, description: handScanDesc, icon: handScanIcon, router: handScanRouter))
+            scanModules.append(ScanModule(withName: demoScanName, description: demoScanDesc, icon: demoScanIcon, router: demoScanRouter))
         }
-        AppData.getSharedAppData().scanModules = scanModules
+        AppData.sharedAppData.scanModules = scanModules
     }
 }
 
@@ -78,6 +90,7 @@ extension ModuleFactory {
 extension ModuleFactory {
     private func buildDemographicsModule() {
         var demographics = [Demographic]()
+        var required = false
         
         // Build demographics
         var feet = [String]()
@@ -102,36 +115,22 @@ extension ModuleFactory {
         let fruitsVeggies = Demographic(withDemoName: "Fruit/Veggie Consumption", rowData: [["0-1 servings per day", "2-3 servings per day", "4 or more servings per day"]], rowTitles: ["Servings"], icon: demographicIcon)
         let gender = Demographic(withDemoName: "Gender", rowData: [["Male", "Female"]], rowTitles: ["Gender"], icon: demographicIcon)
         
-        switch scanOperator?.market {
+        switch market {
         case "North America":
             demographics = [imperialHeight, imperialWeight, ethnicity, fruitsVeggies]
-            AppData.getSharedAppData().demoModule = DemographicModule(withName: demographicName,
-                                                                      details: demographicDesc,
-                                                                      icon: demographicIcon,
-                                                                      demoQuestions: demographics,
-                                                                      required: false)
         case "Germany":
             demographics = [metricHeight, metricWeight, supplementation, gender]
-            AppData.getSharedAppData().demoModule = DemographicModule(withName: demographicName,
-                                                                      details: demographicDesc,
-                                                                      icon: demographicIcon,
-                                                                      demoQuestions: demographics,
-                                                                      required: false)
         case "China":
             demographics = [metricHeight, metricWeight, taiChi, supplementation]
-            AppData.getSharedAppData().demoModule = DemographicModule(withName: demographicName,
-                                                                      details: demographicDesc,
-                                                                      icon: demographicIcon,
-                                                                      demoQuestions: demographics,
-                                                                      required: true)
+            required = true
         default:
             demographics = [metricHeight, metricWeight, supplementation, fruitsVeggies]
-            AppData.getSharedAppData().demoModule = DemographicModule(withName: demographicName,
-                                                                      details: demographicDesc,
-                                                                      icon: demographicIcon,
-                                                                      demoQuestions: demographics,
-                                                                      required: false)
         }
+        AppData.sharedAppData.demoModule = DemographicModule(withName: demographicName,
+                                            details: demographicDesc,
+                                            icon: demographicIcon,
+                                            demoQuestions: demographics,
+                                            required: required)
     }
 }
 
@@ -139,20 +138,56 @@ extension ModuleFactory {
 extension ModuleFactory {
     private func buildRouterModules() throws {
         let storyboard = UIStoryboard(name: "Scan", bundle: nil)
-        guard let navRouter = storyboard.instantiateViewController(withIdentifier: "ScanNav") as? RouterNavigationController else {
-            let error = NSError(domain: "ModuleFactory", code: 1, userInfo: ["Message": "Could not instantiate Router from storyboard \(storyboard)"])
-            throw error
+        guard let navController = storyboard.instantiateInitialViewController() as? UINavigationController else {
+            throw ModuleFactoryError.invalidInitialControllerForRouter
         }
-        switch scanOperator?.market {
+        handScanRouter = RouterModule(navController: navController)
+        demoScanRouter = RouterModule(navController: navController)
+        thvScanRouter = RouterModule(navController: navController)
+        switch market {
         case "North America":
-            navRouter.navQueue = ["ScanProcess"]
+            handScanRouter.navQueue = ["ScanProcess"]
+            demoScanRouter.navQueue = ["ScanProcess"]
+            handScanRouter.setRootViewController(rootViewControllerIdentity: handScanRouter.navQueue[0])
+            demoScanRouter.setRootViewController(rootViewControllerIdentity: demoScanRouter.navQueue[0])
         case "Germany":
-            navRouter.navQueue = ["ScanProcess", "Demographics"]
+            handScanRouter.navQueue = ["ScanProcess", "Demographics"]
+            demoScanRouter.navQueue = ["ScanProcess", "Demographics"]
+            thvScanRouter.navQueue = ["ScanProcess", "Demographics"]
+            handScanRouter.setRootViewController(rootViewControllerIdentity: handScanRouter.navQueue[0])
+            demoScanRouter.setRootViewController(rootViewControllerIdentity: demoScanRouter.navQueue[0])
+            thvScanRouter.setRootViewController(rootViewControllerIdentity: thvScanRouter.navQueue[0])
         case "China":
-            navRouter.navQueue = ["Demographics", "ScanProcess"]
+            handScanRouter.navQueue = ["Demographics", "ScanProcess"]
+            thvScanRouter.navQueue = ["Demographics", "ScanProcess"]
+            handScanRouter.setRootViewController(rootViewControllerIdentity: handScanRouter.navQueue[0])
+            thvScanRouter.setRootViewController(rootViewControllerIdentity: thvScanRouter.navQueue[0])
         default:
-            navRouter.navQueue = ["ScanProcess"]
+            handScanRouter.navQueue = ["ScanProcess"]
+            demoScanRouter.navQueue = ["ScanProcess"]
+            handScanRouter.setRootViewController(rootViewControllerIdentity: handScanRouter.navQueue[0])
+            demoScanRouter.setRootViewController(rootViewControllerIdentity: demoScanRouter.navQueue[0])
         }
-        scanRouter = navRouter
     }
 }
+
+//extension ModuleFactory {
+//    private func buildRouterNavControllers() throws {
+//        let storyboard = UIStoryboard(name: "Scan", bundle: nil)
+//        guard let navRouter = storyboard.instantiateViewController(withIdentifier: "ScanNav") as? RouterNavigationController else {
+//            let error = NSError(domain: "ModuleFactory", code: 1, userInfo: ["Message": "Could not instantiate Router from storyboard \(storyboard)"])
+//            throw error
+//        }
+//        switch scanOperator?.market {
+//        case "North America":
+//            navRouter.navQueue = ["ScanProcess"]
+//        case "Germany":
+//            navRouter.navQueue = ["ScanProcess", "Demographics"]
+//        case "China":
+//            navRouter.navQueue = ["Demographics", "ScanProcess"]
+//        default:
+//            navRouter.navQueue = ["ScanProcess"]
+//        }
+//        scanRouter = navRouter
+//    }
+//}

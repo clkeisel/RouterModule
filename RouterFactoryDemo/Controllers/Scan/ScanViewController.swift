@@ -10,8 +10,8 @@ import UIKit
 
 class ScanViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
-    var values = [Int]()
-    var scanModule = AppData.getSharedAppData().scanModules[0]
+    private var values = [Int]()
+    var router: RouterModule!
 
     @IBOutlet weak var scanScorePickerView: UIPickerView!
     
@@ -25,6 +25,11 @@ class ScanViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         
         scanScorePickerView.dataSource = self
         scanScorePickerView.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        router = AppData.sharedAppData.currentScanRouter
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,15 +50,11 @@ class ScanViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     }
     
     @IBAction func startScan(_ sender: Any) {
-        let randomScore = (Int)(arc4random_uniform(99999) + 1)
+        let randomScore = (Int)(arc4random_uniform(90000) + 10000)
         scanScorePickerView.selectRow(randomScore, inComponent: 0, animated: true)
     }
     
     @IBAction func done(_ sender: Any) {
-        guard let router = self.navigationController as? RouterNavigationController else {
-            print("Scan View Controller expected a RouterNavigationController, but wasn't found.")
-            return
-        }
         router.next()
     }
     

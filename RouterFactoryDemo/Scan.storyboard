@@ -12,10 +12,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Router Navigation Controller-->
+        <!--Navigation Controller-->
         <scene sceneID="7l8-0j-cIm">
             <objects>
-                <navigationController storyboardIdentifier="ScanNav" id="w68-eW-C4x" customClass="RouterNavigationController" customModule="RouterFactoryDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="ScanNav" id="w68-eW-C4x" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="19V-Cn-ZwF">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -108,7 +108,7 @@
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="USf-Cz-xHY">
                                 <rect key="frame" x="16" y="455" width="343" height="30"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JFq-G6-k7a">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JFq-G6-k7a">
                                         <rect key="frame" x="0.0" y="0.0" width="163.5" height="30"/>
                                         <color key="backgroundColor" red="0.88235294119999996" green="0.34509803919999998" blue="0.16078431369999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="Back">

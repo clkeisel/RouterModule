@@ -14,30 +14,24 @@ class DemographicViewController: UIViewController, UIPickerViewDelegate, UIPicke
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var skipButton: UIButton!
     
-    var demographicModule = AppData.getSharedAppData().demoModule
-    var scanModule = AppData.getSharedAppData().scanModules[0]
+    var demographicModule = AppData.sharedAppData.demoModule!
+    var router: RouterModule!
     var demoContainerVC: DemographicContainerViewController!
-    var routerNav: RouterNavigationController?
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         demoContainerVC = self.childViewControllers[0] as! DemographicContainerViewController
-        demoContainerVC.currentDemographic = demographicModule?.next()
+        demoContainerVC.currentDemographic = demographicModule.navQueue[0]
         
-        routerNav = self.navigationController as? RouterNavigationController
+        pageControl.numberOfPages = demographicModule.navQueue.count
         
-        if let pages = demographicModule?.navQueue.count {
-            pageControl.numberOfPages = pages
-        }
-        skipButton.isHidden = demographicModule!.isRequired
-        
-        guard let routerNav = self.navigationController as? RouterNavigationController else {
-            print("Demographics expected RouterNavigationController but didn't find one.")
-            return
-        }
-        self.routerNav = routerNav
+        skipButton.isHidden = demographicModule.isRequired
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,38 +39,48 @@ class DemographicViewController: UIViewController, UIPickerViewDelegate, UIPicke
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        router = AppData.sharedAppData.currentScanRouter
+    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        guard let demographics = demographicModule else { return 0 }
-        let demographic = demographics.navQueue[demographics.current]
+        let demographic = demographicModule.navQueue[demographicModule.current]
         return demographic.rowTitles.count
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        guard let demographics = demographicModule else { return 0 }
-        let demographic = demographics.navQueue[demographics.current]
+        let demographic = demographicModule.navQueue[demographicModule.current]
         return demographic.rowData.count
     }
     
     @IBAction func skip(_ sender: Any) {
-        routerNav!.next()
+        router.next()
     }
     
     @IBAction func next(_ sender: Any) {
         if pageControl.currentPage + 1 < pageControl.numberOfPages {
             pageControl.currentPage += 1
-            backButton.isEnabled = true
             
             // Set the demographic to the next one in the module
-            demoContainerVC.currentDemographic = demographicModule?.next()
+            demographicModule.next()
+            demoContainerVC.currentDemographic = demographicModule.navQueue[demographicModule.current]
             demoContainerVC.nextDeomgraphic()
         } else {
-            routerNav!.next()
+            router.next()
         }
     }
     
     @IBAction func back(_ sender: Any) {
-        
+        if pageControl.currentPage - 1 > 0 {
+            pageControl.currentPage -= 1
+            
+            demographicModule.previous()
+            demoContainerVC.currentDemographic = demographicModule.navQueue[demographicModule.current]
+            demoContainerVC.nextDeomgraphic()
+        } else {
+            router.previous()
+        }
     }
     
     
